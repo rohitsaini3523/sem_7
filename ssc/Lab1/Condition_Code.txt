@@ -1,0 +1,6 @@
+LT 1
+LE 2
+EQ 3
+GT 4
+GE 5
+ANY(NE) 6

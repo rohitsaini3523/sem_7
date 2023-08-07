@@ -1,0 +1,4 @@
+AREG 1
+BREG 2
+CREG 3
+DREG 4
