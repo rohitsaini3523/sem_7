@@ -3,36 +3,54 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-class optable {
+class operator {
     String instruction;
     String statement_class;
     int machine_code;
 
-    public void optable_value(String instruction, String statement_class, int machine_code) {
+    public void operator_value(String instruction, String statement_class, int machine_code) {
         this.instruction = instruction;
         this.statement_class = statement_class;
         this.machine_code = machine_code;
     }
 }
 
-class rttable {
+class register {
     String reg_name;
     int machine_code;
 
-    public void rttable_value(String reg_name, int machine_code) {
+    public void register_value(String reg_name, int machine_code) {
         this.reg_name = reg_name;
         this.machine_code = machine_code;
     }
 }
 
-class cctable {
+class condition_code {
     String condition;
     int machine_code;
 
-    public void cctable_value(String condition, int machine_code) {
+    public void condition_code_value(String condition, int machine_code) {
         this.condition = condition;
         this.machine_code = machine_code;
     }
+}
+
+class symboltable {
+    int symbol_no;
+    String symbol_name;
+    int address;
+
+}
+
+class literal {
+    int literal_no;
+    String literal_name;
+    int address;
+
+}
+
+class pool_tab {
+
 }
 
 public class data_table {
@@ -40,7 +58,7 @@ public class data_table {
         try {
             File file = new File("C:\\Users\\rohit\\Documents\\GitHub\\sem_7\\ssc\\Lab1\\OPTAB.txt");
             Scanner sc = new Scanner(file);
-            optable[] OPTAB = new optable[18];
+            operator[] OPTAB = new operator[18];
             String S = "";
             while (sc.hasNextLine()) {
                 String temp = sc.nextLine();
@@ -49,8 +67,8 @@ public class data_table {
             String[] data = S.split(" ");
 
             for (int j = 0; j < data.length; j += 3) {
-                OPTAB[j / 3] = new optable();
-                OPTAB[j / 3].optable_value(data[j], data[j + 1], Integer.parseInt(data[j + 2]));
+                OPTAB[j / 3] = new operator();
+                OPTAB[j / 3].operator_value(data[j], data[j + 1], Integer.parseInt(data[j + 2]));
                 // System.out.println(data[j] + " " + data[j + 1] + " " +
                 // Integer.parseInt(data[j + 2]));
             }
@@ -66,7 +84,7 @@ public class data_table {
             // code for register table
             file = new File("C:\\Users\\rohit\\Documents\\GitHub\\sem_7\\ssc\\Lab1\\Register_Table.txt");
             Scanner sc1 = new Scanner(file);
-            rttable[] RTtable = new rttable[4];
+            register[] RTtable = new register[4];
             S = "";
             while (sc1.hasNextLine()) {
                 String temp = sc1.nextLine();
@@ -75,8 +93,8 @@ public class data_table {
             data = S.split(" ");
 
             for (int j = 0; j < data.length; j += 2) {
-                RTtable[j / 2] = new rttable();
-                RTtable[j / 2].rttable_value(data[j], Integer.parseInt(data[j + 1]));
+                RTtable[j / 2] = new register();
+                RTtable[j / 2].register_value(data[j], Integer.parseInt(data[j + 1]));
             }
 
             /*
@@ -89,7 +107,7 @@ public class data_table {
             // code for condition code
             file = new File("C:\\Users\\rohit\\Documents\\GitHub\\sem_7\\ssc\\Lab1\\Condition_Code.txt");
             Scanner sc2 = new Scanner(file);
-            cctable[] CCtable = new cctable[6];
+            condition_code[] CCtable = new condition_code[6];
             S = "";
             while (sc2.hasNextLine()) {
                 String temp = sc2.nextLine();
@@ -98,8 +116,8 @@ public class data_table {
             data = S.split(" ");
 
             for (int j = 0; j < data.length; j += 2) {
-                CCtable[j / 2] = new cctable();
-                CCtable[j / 2].cctable_value(data[j], Integer.parseInt(data[j + 1]));
+                CCtable[j / 2] = new condition_code();
+                CCtable[j / 2].condition_code_value(data[j], Integer.parseInt(data[j + 1]));
             }
 
             /*
@@ -112,72 +130,159 @@ public class data_table {
             sc1.close();
             sc2.close();
             // creating hashmap of all tables
-            HashMap<String, optable> OPTAB_data = new HashMap<>();
+            /* Operator Table */
+            HashMap<String, operator> OPTAB_data = new HashMap<>();
             for (int i = 0; i < OPTAB.length; i++) {
                 OPTAB_data.put(OPTAB[i].instruction, OPTAB[i]);
             }
-
-            HashMap<String, rttable> RTtable_data = new HashMap<>();
+            /* Register Table */
+            HashMap<String, register> RTtable_data = new HashMap<>();
             for (int i = 0; i < RTtable.length; i++) {
                 RTtable_data.put(RTtable[i].reg_name, RTtable[i]);
             }
-            HashMap<String, cctable> CCtable_data = new HashMap<>();
+            /* Condition Code Table */
+            HashMap<String, condition_code> CCtable_data = new HashMap<>();
             for (int i = 0; i < CCtable.length; i++) {
                 CCtable_data.put(CCtable[i].condition, CCtable[i]);
             }
+            /* Symbol Table data to store*/
             ArrayList<String> indexed = new ArrayList<>();
+            /* Literal Table data */
+            ArrayList<String> literal = new ArrayList<>();
             String input_data = reader.read();
-            System.out.println(input_data);
+            int Location_Counter = 0;
+            // System.out.println(input_data);
             String[] output = string_token.token(input_data, "\n");
             for (int i = 0; i < output.length; i++) {
                 String[] temp = string_token.token(output[i], " ");
+                if (temp[0].equals("START"))
+                {
+                    try{
+                        Location_Counter = Integer.parseInt(temp[1]);
+                    }
+                    catch(Exception e)
+                    {
+                        Location_Counter = 0;
+                    }
+                }
                 // System.out.println(temp.length);
                 if (temp[0] != "END" && temp.length == 1) {
                     // System.out.print(temp.toString());
                     temp[0] = '(' + OPTAB_data.get(temp[0]).statement_class + ',' + OPTAB_data.get(temp[0]).machine_code
                             + ')';
-                    output[i] = temp[0];
+                    output[i] = Location_Counter + "  "  + temp[0];
 
                 } else if (temp.length == 2) {
-                    temp[0] = '(' + OPTAB_data.get(temp[0]).statement_class + ',' + OPTAB_data.get(temp[0]).machine_code
-                            + ')';
-                    try {
-                        Integer.parseInt(temp[1]);
-                        temp[1] = "(C," + temp[1] + ")";
-                    } catch (NumberFormatException e) {
-                        // Error;
-                        temp[1] = "(S," + index_in_symboltable(indexed, temp[1]) + ")";
+                    if (temp[0].equals("LAST")) {
+                        try {
+                            Integer.parseInt(temp[0]);
+                            temp[0] = "(C," + temp[0] + ")";
+                        } catch (NumberFormatException e) {
+                            // Error;
+                            temp[0] = "(S," + index_in_symboltable(indexed, temp[0]) + ")";
+                        }
+                        temp[1] = '(' + OPTAB_data.get(temp[1]).statement_class + ','
+                                + OPTAB_data.get(temp[1]).machine_code
+                                + ')';
+                        output[i] = Location_Counter + "  "  + temp[1];
+                    } else {
+                        temp[0] = '(' + OPTAB_data.get(temp[0]).statement_class + ','
+                                + OPTAB_data.get(temp[0]).machine_code
+                                + ')';
+                        try {
+                            Integer.parseInt(temp[1]);
+                            temp[1] = "(C," + temp[1] + ")";
+                        } catch (NumberFormatException e) {
+                            // Error;
+                            temp[1] = "(S," + index_in_symboltable(indexed, temp[1]) + ")";
+                        }
+                        output[i] = Location_Counter + "  "  + temp[0] + temp[1];
                     }
-                    output[i] = temp[0] + temp[1];
-                } else if (temp.length == 3 && temp[0].length() > 1) {
-                    // System.out.println(temp[0] + "-" + temp[1] + "-" + temp[2]);
+                } else if (temp.length == 3) {
+                    try{
+                        Location_Counter += Integer.parseInt(temp[2]);
+                    }
+                    catch(Exception e)
+                    {
+                        Location_Counter++;
+                    }
+                    if (temp[0].equals("BACK")) {
+                        try {
+                            Integer.parseInt(temp[0]);
+                            temp[0] = "(C," + temp[0] + ")";
+                        } catch (NumberFormatException e) {
+                            // Error;
+                            temp[0] = "(S," + index_in_symboltable(indexed, temp[0]) + ")";
+                        }
+                        temp[1] = '(' + OPTAB_data.get(temp[1]).statement_class + ','
+                                + OPTAB_data.get(temp[1]).machine_code
+                                + ')';
+                        try {
+                            Integer.parseInt(temp[2]);
+                            temp[2] = "(C," + temp[2] + ")";
+                        } catch (NumberFormatException e) {
+                            // Error;
+                            temp[2] = "(S," + index_in_symboltable(indexed, temp[2]) + ")";
+                        }
+                        output[i] = Location_Counter + "  " + temp[1] + temp[2];
+                    } else if (temp[0].length() > 1 && indexed.contains(temp[0])) {
+                        temp[1] = '(' + OPTAB_data.get(temp[1]).statement_class + ',' +
+                                OPTAB_data.get(temp[1]).machine_code
+                                + ')';
+                        // System.out.print(temp[1] + "-");
+                        try {
+                            Integer.parseInt(temp[2]);
+                            temp[2] = "(C," + temp[2] + ")";
+                        } catch (NumberFormatException e) {
+                            // Error;
+                            temp[2] = "(S," + index_in_symboltable(indexed, temp[2]) + ")";
+                        }
+                        output[i] = Location_Counter + "  "+  temp[1] + temp[2];
+                    } else if (temp[0].length() > 1) {
+                        temp[0] = '(' + OPTAB_data.get(temp[0]).statement_class + ',' +
+                                OPTAB_data.get(temp[0]).machine_code
+                                + ')';
+                        // System.out.print(temp[1] + "-");
+                        try {
+                            temp[1] = " " + RTtable_data.get(temp[1]).machine_code + " ";
+                        } catch (Exception e) {
+                            temp[1] = " " + CCtable_data.get(temp[1]).machine_code + " ";
+                        }
+                        try {
+                            Integer.parseInt(temp[2]);
+                            temp[2] = "(C," + temp[2] + ")";
+                        } catch (NumberFormatException e) {
+                            // Error;
+                            temp[2] = "(S," + index_in_symboltable(indexed, temp[2]) + ")";
+                        }
+                        output[i] =Location_Counter + "  " +  temp[0] + temp[1] + temp[2];
+                    } else if (temp[0].length() == 1) {
+                        try {
+                            Integer.parseInt(temp[0]);
+                            temp[0] = "(C," + temp[0] + ")";
+                        } catch (NumberFormatException e) {
+                            // Error;
+                            temp[0] = "(S," + index_in_symboltable(indexed, temp[0]) + ")";
+                        }
+                        temp[1] = '(' + OPTAB_data.get(temp[1]).statement_class + ',' +
+                                OPTAB_data.get(temp[1]).machine_code
+                                + ')';
+                        // System.out.print(temp[1] + "-");
+                        try {
+                            Integer.parseInt(temp[2]);
+                            temp[2] = "(C," + temp[2] + ")";
+                        } catch (NumberFormatException e) {
+                            // Error;
+                            temp[2] = "(S," + index_in_symboltable(indexed, temp[2]) + ")";
+                        }
 
-                    temp[0] = '(' + OPTAB_data.get(temp[0]).statement_class + ',' +
-                            OPTAB_data.get(temp[0]).machine_code
-                            + ')';
-                    temp[1] = " " + RTtable_data.get(temp[1]).machine_code + " ";
+                        output[i] = Location_Counter + "  "+  temp[1] + temp[2];
+                    }
 
-                    try {
-                        Integer.parseInt(temp[2]);
-                        temp[2] = "(C," + temp[2] + ")";
-                    } catch (NumberFormatException e) {
-                        // Error;
-                        temp[2] = "(S," + index_in_symboltable(indexed, temp[2]) + ")";
-                    }
-                    output[i] = temp[0] + temp[1] + temp[2];
-                } else if (temp.length == 3 && temp[0].length() == 1) {
-                    temp[1] = '(' + OPTAB_data.get(temp[1]).statement_class + ',' +
-                            OPTAB_data.get(temp[1]).machine_code
-                            + ')';
-                    try {
-                        Integer.parseInt(temp[2]);
-                        temp[2] = "(C," + temp[2] + ")";
-                    } catch (NumberFormatException e) {
-                        // Error;
-                        temp[2] = "(S," + index_in_symboltable(indexed, temp[2]) + ")";
-                    }
-                    output[i] = temp[1] + temp[2];
                 } else if (temp.length == 4) {
+                    // if(temp)
+                    temp[0] = "(S," + index_in_symboltable(indexed, temp[0]) + ")";
+
                     temp[1] = '(' + OPTAB_data.get(temp[1]).statement_class + ',' + OPTAB_data.get(temp[1]).machine_code
                             + ')';
                     temp[2] = " " + RTtable_data.get(temp[2]).machine_code + " ";
@@ -188,11 +293,18 @@ public class data_table {
                         // Error;
                         temp[3] = "(S," + index_in_symboltable(indexed, temp[3]) + ")";
                     }
-                    output[i] = temp[1] + temp[2] + temp[3];
+                    output[i] = Location_Counter + "  "  + temp[1] + temp[2] + temp[3];
                 }
+                System.out.println(output[i]);
             }
+            /* Printing the pass-1 */
+            System.out.println("Ouput After Pass1: ");
             for (int i = 0; i < output.length; i++) {
                 System.out.println(output[i]);
+            }
+            System.out.println("Symbol Table: ");
+            for (int i = 0; i < indexed.size(); i++) {
+                System.out.println(indexed.get(i));
             }
 
         } catch (Exception e) {
@@ -204,12 +316,25 @@ public class data_table {
         int index = 0;
         for (String str : indexed) {
             if (str.equals(S)) {
-                return index+1;
+                return index + 1;
                 // If the string is found, return true
             }
             index++;
         }
         indexed.add(S);
-        return indexed.indexOf(S)+1;
+        return indexed.indexOf(S) + 1;
+    }
+
+    public static int index_in_literaltable(ArrayList<String> literal, String S) {
+        int index = 0;
+        for (String str : literal) {
+            if (str.equals(S)) {
+                return index + 1;
+                // If the string is found, return true
+            }
+            index++;
+        }
+        literal.add(S);
+        return literal.indexOf(S) + 1;
     }
 }

@@ -16,7 +16,7 @@ class reader {
             Scanner sc = new Scanner(file);
             // System.out.println("Reading File Using Scanner");
             while (sc.hasNextLine()) {
-                S += sc.nextLine() + "\n";
+                S += sc.nextLine().replace(',', ' ') + "\n";
                 // System.out.println(S);
             }
             sc.close();
