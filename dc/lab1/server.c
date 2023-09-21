@@ -15,6 +15,14 @@ int evaluateExpression(const char *expression)
     {
     case '+':
         return num1 + num2;
+    case '-':
+        return num1 - num2;
+    case '*':
+        return num1 * num2;
+    case '/':
+        if (num2 == 0)
+            return 0;
+        return num1 / num2;
     default:
         printf("Unsupported operator: %c\n", operator);
         return 0;
@@ -52,8 +60,9 @@ void *clientHandler(void *clientSocketPtr)
         int ans = add(buffer);
         printf("Answer: %d\n", ans);
 
-        char ansStr[20];
-        snprintf(ansStr, sizeof(ansStr), " Answer: %d", ans);
+        char ansStr[20] = "";
+        memset(buffer, 0, 1024);
+        snprintf(ansStr, sizeof(ansStr), "%d", ans);
         strcat(buffer, ansStr);
 
         send(client_socket, buffer, strlen(buffer), 0);
@@ -125,7 +134,7 @@ int main()
 gcc server.c -o server -Wall
  */
 
-/* 
+/*
 Name: Rohit Saini
 Erp: 1032200897
 Panel: C
