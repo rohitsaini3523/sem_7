@@ -53,7 +53,7 @@ class pool_tab {
 
 }
 
-public class data_table {
+public class lab1 {
     public static void main(String[] args) {
         try {
             File file = new File("C:\\Users\\rohit\\Documents\\GitHub\\sem_7\\ssc\\Lab1\\OPTAB.txt");
@@ -295,7 +295,7 @@ public class data_table {
                     }
                     output[i] = Location_Counter + "  "  + temp[1] + temp[2] + temp[3];
                 }
-                System.out.println(output[i]);
+                // System.out.println(output[i]);
             }
             /* Printing the pass-1 */
             System.out.println("Ouput After Pass1: ");
