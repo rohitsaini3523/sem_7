@@ -5,7 +5,7 @@ class reader {
     public static void main(String[] args)
     {
         String S = read();
-        // System.out.println(S);
+        System.out.println(S);
     }
 
     public static String read()

@@ -47,6 +47,61 @@ public class lab3 {
         return ans;
     }
 
+    public static int Macro_position(String s, ArrayList<macro_name> macro_name) {
+        for (int i = 0; i < macro_name.size(); i++) {
+            if (s.equals(macro_name.get(i).Name)) {
+                return i + 1;
+            }
+        }
+        return -1;
+    }
+
+    public static String argument_match(String data, String definition, ArrayList<argument_list> arg)
+    {
+        String[] data_token = string_token.token(data, " ");
+        String ans = "";
+        String[] temp = string_token.token(definition, " ");
+        for (int i = 0; i < temp.length; i++)
+        {
+            if(temp[i].charAt(0) == '&')
+            {
+                // System.out.println("Argument: "+temp[i]);
+                for (int j = 0; j < arg.size(); j++) {
+                    if (arg.get(j).argument.equals(temp[i])) {
+                        temp[i] = data_token[j + 1];
+                        break;
+                    }
+                }
+            }
+            ans += temp[i]+" ";
+        }
+        return ans+"\n";
+    }
+
+    public static String expand_macro(String Expanded_code, ArrayList<macro_definition> macro_definition_table,
+        ArrayList<macro_name> macro_name, String temp, int macro_pos) {
+        String[] temp1 = string_token.token(temp, " ");
+        // int total_arguments = temp1.length-1;
+        // System.out.println(total_arguments);
+        int definition_pointer = 0;
+        int macro_name_pointer = 0;
+        for (int i = 0; i < macro_name.size(); i++) {
+            if (temp1[0].equals(macro_name.get(i).Name)) {
+                definition_pointer = macro_name.get(i).definition_pointer;
+                macro_name_pointer = i;
+                break;
+            }
+        }
+        while(!macro_definition_table.get(definition_pointer).definition.equals("MEND"))
+        {
+            // System.out.println("data: " + macro_definition_table.get(definition_pointer).definition);
+            Expanded_code += argument_match(temp, macro_definition_table.get(definition_pointer).definition,
+                    macro_name.get(macro_name_pointer).A);
+            definition_pointer++;
+        }
+        return Expanded_code;
+    }
+
     public static void main(String[] args) {
         try {
             String input_data = reader.read();
@@ -102,25 +157,43 @@ public class lab3 {
                     output_file = output_file + '\n' + output[i];
                 }
             }
-            System.out.println("Macro Name Table:");
+            System.out.println("\nMacro Name Table:");
             for (int i = 0; i < macro_name.size(); i++) {
                 System.out.println(macro_name.get(i).Index + " " + macro_name.get(i).Name + " "
                         + macro_name.get(i).definition_pointer);
             }
             for (int i = 0; i < macro_name.size(); i++) {
-                System.out.println("Argument List Table for " + macro_name.get(i).Name);
+                System.out.println("\nArgument List Table for " + macro_name.get(i).Name);
                 for (int j = 0; j < macro_name.get(i).A.size(); j++) {
                     System.out.println(macro_name.get(i).A.get(j).index + " " + macro_name.get(i).A.get(j).argument);
                 }
             }
-            System.out.println("Macro Definition Table:");
+            System.out.println("\nMacro Definition Table:");
             for (int i = 0; i < macro_definition_table.size(); i++) {
                 System.out
                         .println(i + 1 + " "
                                 + mapper(macro_definition_table.get(i).definition, arg, macro_name));
             }
-            System.out.println("Ouput File:");
+            System.out.println("\nPass-1 Ouput File:");
             System.out.println(output_file);
+
+            /* Code for expantion of macro calling */
+            String[] output_data = string_token.token(output_file, "\n");
+            String Expanded_code = "";
+            for (int i = 0; i < output_data.length; i++) {
+                String[] temp = string_token.token(output_data[i], " ");
+                int macro_pos = Macro_position(temp[0], macro_name);
+                if (macro_pos != -1) {
+                    /* get definition and replace the arguments from argument table */
+                    // System.out.println("Macro-Position: " + macro_pos);
+                    Expanded_code = expand_macro(Expanded_code, macro_definition_table, macro_name, output_data[i], macro_pos);
+
+                } else {
+                    Expanded_code += output_data[i];
+                }
+                Expanded_code += "\n";
+            }
+            System.out.println("\nExpantion of Macro: \n" + Expanded_code);
 
         } catch (Exception e) {
             e.printStackTrace();
