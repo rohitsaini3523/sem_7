@@ -172,23 +172,42 @@ public class lab1 {
             String[] output = string_token.token(input_data, "\n");
             for (int i = 0; i < output.length; i++) {
                 String[] temp = string_token.token(output[i], " ");
+                if (temp[0].equals("LTROG")) {
+                    try {
+                        temp[0] = '(' + OPTAB_data.get(temp[0]).statement_class + ','
+                                + OPTAB_data.get(temp[0]).machine_code
+                                + ')';
+                    } catch (NullPointerException e) {
+                        temp[0] = temp[0];
+                    }
+                    output[i] = Location_Counter++ + "  " + temp[0];
+
+                }
                 if (temp[0].equals("ORIGIN")) {
                     int k = 0;
                     try {
                         k = find_address(symbol_table_indexed, temp[1]);
+                        k -= Base_addr;
+                        // System.out.println("K_s: " + k);
                         if (k == 0) {
                             throw new Exception();
                         }
                     } catch (Exception e) {
                         try {
                             k = find_address_l(literal_index, temp[1]);
+                            // System.out.println("K_l: " + k);
+                            k -= Base_addr;
                             if (k == 0)
                                 throw new Exception();
                         } catch (Exception e1) {
-                            k = Location_Counter + 1;
+                            k = 0;
                         }
                     }
-                    Location_Counter = k - 1;
+                    // System.out.println("K: " + k);
+                    // System.out.println("temp: " + temp[0] + " " + temp[1] + " " + temp[2]);
+                    Location_Counter = Base_addr + k - 1;
+                    if (temp.length > 2)
+                        Location_Counter++;
                     // System.out.println("Base addr: " + Base_addr);
                     // System.out.println("addr: " + k);
                 }
@@ -199,6 +218,10 @@ public class lab1 {
                     } catch (Exception e) {
                         Location_Counter = 0;
                     }
+                }
+                if (temp[0].equals("LTORG") || temp[0].equals("END")) {
+                    set_literal_value(literal_index, Location_Counter);
+                    Location_Counter++;
                 }
                 // System.out.println(temp.length);
                 if (temp[0] != "END" && temp.length == 1) {
@@ -223,7 +246,7 @@ public class lab1 {
                             if (k != -1)
                                 temp[0] = " (S," + k + ")";
                             else {
-                                k = index_in_literaltable(literal_index, Location_Counter, temp[0]);
+                                k = index_in_literaltable(literal_index, -1, temp[0]);
                                 temp[0] = " (L," + k + ")";
 
                             }
@@ -257,7 +280,7 @@ public class lab1 {
                                 if (k != -1)
                                     temp[1] = " (S," + k + ")";
                                 else {
-                                    k = index_in_literaltable(literal_index, Location_Counter, temp[1]);
+                                    k = index_in_literaltable(literal_index, -1, temp[1]);
                                     temp[1] = " (L," + k + ")";
 
                                 }
@@ -279,14 +302,14 @@ public class lab1 {
                     String d_temp = temp[2];
                     if (temp[0].equals("ORIGIN")) {
                         int k = index_in_symboltable(symbol_table_indexed, Location_Counter, temp[1]);
-                        if (k != -1)
+                        if (k != -1) {
                             temp[1] = " (S," + k + ")";
-                        else {
-                            k = index_in_literaltable(literal_index, Location_Counter, temp[1]);
+                        } else {
+                            k = index_in_literaltable(literal_index, -1, temp[1]);
                             temp[1] = " (L," + k + ")";
 
                         }
-                        temp[1] = " (S," + Location_Counter + 1 + ")";
+                        // temp[1] = " (S," + Location_Counter + 1 + ")";
                     }
 
                     if (temp[0].equals("BACK")) {
@@ -299,7 +322,7 @@ public class lab1 {
                             if (k != -1)
                                 temp[0] = " (S," + k + ")";
                             else {
-                                k = index_in_literaltable(literal_index, Location_Counter, temp[0]);
+                                k = index_in_literaltable(literal_index, -1, temp[0]);
                                 temp[0] = " (L," + k + ")";
 
                             }
@@ -324,7 +347,7 @@ public class lab1 {
                             if (k != -1)
                                 temp[2] = " (S," + k + ")";
                             else {
-                                k = index_in_literaltable(literal_index, Location_Counter, temp[2]);
+                                k = index_in_literaltable(literal_index, -1, temp[2]);
                                 temp[2] = " (L," + k + ")";
 
                             }
@@ -355,7 +378,7 @@ public class lab1 {
                             if (k != -1)
                                 temp[2] = " (S," + k + ")";
                             else {
-                                k = index_in_literaltable(literal_index, Location_Counter, temp[2]);
+                                k = index_in_literaltable(literal_index, -1, temp[2]);
                                 temp[2] = " (L," + k + ")";
 
                             }
@@ -380,7 +403,7 @@ public class lab1 {
                                 if (k != -1)
                                     temp[0] = " (S" + k + ")";
                                 else {
-                                    k = index_in_literaltable(literal_index, Location_Counter, d_t);
+                                    k = index_in_literaltable(literal_index, -1, d_t);
                                     temp[0] = " (L," + k + ")";
                                 }
                             }
@@ -413,7 +436,7 @@ public class lab1 {
                             if (k != -1)
                                 temp[2] = " (S," + k + ")";
                             else {
-                                k = index_in_literaltable(literal_index, Location_Counter, d_t);
+                                k = index_in_literaltable(literal_index, -1, d_t);
                                 temp[2] = " (L," + k + ")";
 
                             }
@@ -434,9 +457,8 @@ public class lab1 {
                             if (k != -1)
                                 temp[0] = " (S," + k + ")";
                             else {
-                                k = index_in_literaltable(literal_index, Location_Counter, temp[0]);
+                                k = index_in_literaltable(literal_index, -1, temp[0]);
                                 temp[0] = " (L," + k + ")";
-
                             }
                         }
                         try {
@@ -450,25 +472,32 @@ public class lab1 {
                         try {
                             Integer.parseInt(temp[2]);
                             temp[2] = " (C," + temp[2] + ")";
+
                         } catch (NumberFormatException e) {
                             // Error;
                             int k = index_in_symboltable(symbol_table_indexed, Location_Counter, temp[2]);
-                            if (k != -1)
+                            if (k != -1) {
                                 temp[2] = " (S," + k + ")";
-                            else {
-                                k = index_in_literaltable(literal_index, Location_Counter, temp[2]);
+                                try {
+                                    Location_Counter += k;
+                                } catch (Exception e2) {
+                                    Location_Counter++;
+                                }
+                            } else {
+                                k = index_in_literaltable(literal_index, -1, temp[2]);
                                 temp[2] = " (L," + k + ")";
-
                             }
                         }
 
                         output[i] = Location_Counter + "  " + temp[1] + temp[2];
                         try {
+                            if (temp[1].equals("(DL,1)")) {
+                                throw new Exception();
+                            }
                             Location_Counter += Integer.parseInt(d_temp);
                         } catch (Exception e) {
                             Location_Counter++;
                         }
-
                     }
 
                 } else if (temp.length == 4) {
@@ -479,7 +508,7 @@ public class lab1 {
                     if (k != -1)
                         temp[0] = " (S," + k + ")";
                     else {
-                        k = index_in_literaltable(literal_index, Location_Counter, temp[0]);
+                        k = index_in_literaltable(literal_index, -1, temp[0]);
                         temp[0] = " (L," + k + ")";
                     }
                     try {
@@ -498,7 +527,7 @@ public class lab1 {
                         if (k != -1)
                             temp[3] = " (S," + k + ")";
                         else {
-                            k = index_in_literaltable(literal_index, Location_Counter, temp[3]);
+                            k = index_in_literaltable(literal_index, -1, temp[3]);
                             temp[3] = " (L," + k + ")";
 
                         }
@@ -581,7 +610,11 @@ public class lab1 {
                         l = "" + get_literal_name(literal_index, l_set[1]);
                     } else {
                         temp = "0";
-                        l = l_set[1];
+                        try {
+                            l = l_set[1];
+                        } catch (Exception e1) {
+
+                        }
                     }
                     temp = "" + l;
                 }
@@ -648,12 +681,20 @@ public class lab1 {
             index++;
             /* insert data into the symbol table */
         }
-        st.symboltable_value(index, S, Location_Counter, 1);
+        st.symboltable_value(index, S, -1, 1);
         symbol_table_indexed.put(S, st);
         // System.out
         // .println(st.symbol_no + " " + st.symbol_name + " " + st.address + " " +
         // st.length);
         return symbol_table_indexed.size();
+    }
+
+    public static void set_literal_value(HashMap<String, literal> literal_indexed, int Location_Count) {
+        for (String t : literal_indexed.keySet()) {
+            literal l = literal_indexed.get(t);
+            if (l.address == -1)
+                l.address = Location_Count;
+        }
     }
 
     public static int index_in_literaltable(HashMap<String, literal> literal_indexed, int Location_Counter, String S) {

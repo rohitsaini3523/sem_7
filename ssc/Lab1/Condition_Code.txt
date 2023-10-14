@@ -3,4 +3,4 @@ LE 2
 EQ 3
 GT 4
 GE 5
-ANY(NE) 6
+ANY 6
