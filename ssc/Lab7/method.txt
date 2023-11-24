@@ -1,0 +1,8 @@
+flex while.l
+byacc -d while.y
+gcc lex.yy.c y.tab.c
+./a.out
+
+
+.l file contain regular expression 
+.y contain patterns

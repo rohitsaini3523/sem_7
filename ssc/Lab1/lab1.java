@@ -287,18 +287,19 @@ public class lab1 {
                                 temp[1] = " (S," + k + ")";
                             } else {
                                 int k = index_in_symboltable(symbol_table_indexed, Location_Counter, temp[1]);
-                                if (k != -1)
+                                if (k != -1) {
                                     temp[1] = " (S," + k + ")";
-                                else {
+                                } else {
                                     k = index_in_literaltable(literal_index, Location_Counter, temp[1]);
                                     temp[1] = " (L," + k + ")";
-
                                 }
                             }
                         }
                         output[i] = Location_Counter++ + "  " + temp[0] + temp[1];
                     }
                 } else if (temp.length == 3) {
+                    if (temp[1].equals("EQU"))
+                        Location_Counter--;
                     String d_temp = temp[2];
                     if (temp[0].equals("ORIGIN")) {
                         int k = index_in_symboltable(symbol_table_indexed, Location_Counter, temp[1]);
@@ -681,7 +682,7 @@ public class lab1 {
             index++;
             /* insert data into the symbol table */
         }
-        st.symboltable_value(index, S, -1, 1);
+        st.symboltable_value(index, S, Location_Counter, 1);
         symbol_table_indexed.put(S, st);
         // System.out
         // .println(st.symbol_no + " " + st.symbol_name + " " + st.address + " " +
@@ -690,10 +691,12 @@ public class lab1 {
     }
 
     public static void set_literal_value(HashMap<String, literal> literal_indexed, int Location_Count) {
+        int index = 0;
         for (String t : literal_indexed.keySet()) {
             literal l = literal_indexed.get(t);
+
             if (l.address == -1)
-                l.address = Location_Count;
+                l.address = Location_Count+index++;
         }
     }
 

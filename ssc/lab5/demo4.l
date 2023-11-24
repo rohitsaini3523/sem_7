@@ -2,47 +2,54 @@
 #include <stdio.h>
 #include <string.h>
 int count;
-
 %}
-digit [0-9]+
+
+%option noyywrap
+
 letter [a-zA-Z]
+digit [0-9]
 space [' ']
 identifier ({letter}({letter}|{digit})*)
 classname (class{space}({letter}|{digit})*)
 quote \"
-datatype (int|char|float|void)
+datatype (int|char|float|double|void)
 keywords (void|class|throws|import|try|catch|finally|static|implements|extends|main)
 booleanvalues (true|false)
 loops (while|for)
 conditionalStatements (if|else|switch)
-string ({quote}({letter}|{digit})+{quote})
-array ({identifier}(\[))
-
-parenthesis ()
-
-accessspecifier (public|private|protected)
-%%
-{keywords} printf("\n %s is a keyword\n",yytext);
-{accessspecifier} printf("\n %s is access specifier\n",yytext);
-{booleanvalues} printf("\n %s is boolean value\n",yytext);
-{classname} printf("\n %s is a classname\n",yytext);
-{array} printf("\n %s is a array\n",yytext);
-{string} printf("\n %s is a string \n",yytext);
-{quote} printf("\n %s is a quote\n",yytext);
-{conditionalStatements} printf("\n %s is a conditional Statement\n",yytext);
-{loops} printf("\n %s is a loop \n",yytext);
+string ({quote}({letter}|{digit})*{quote})
+array ({identifier}(\[\d+\])*)
+parenthesis ([{}();,])
+comment "//".*
 
 %%
+{space} ;
+[ \t\n] ; // Ignore whitespace
+"import"[^\n]*";" { printf("Preprocessor Directive: %s\n", yytext); }
+"public|private|protected" { printf("Access Specifier: %s\n", yytext); }
+{digit}          { printf("Integer: %s\n",yytext);}
+{keywords}       { printf("Keyword: %s\n", yytext); }
+{datatype}       { printf("Datatype: %s\n", yytext); }
+{booleanvalues}  { printf("Boolean Value: %s\n", yytext);}
+{parenthesis}    { printf("Parenthesis: %s\n", yytext);}
+{identifier}     { printf("Identifier: %s\n", yytext);}
+{classname}      { printf("Classname: %s\n", yytext);}
+{array}          { printf("Array: %s\n", yytext);}
+{string}         { printf("String: %s\n", yytext);}
+{quote}          { printf("Quote: %s\n", yytext);}
+{comment}        { printf("Comment: %s\n", yytext);}
+"&&|\|\||!|!=" { printf("Logical Operator: %s\n", yytext); }
+"<|>|<=|>=|==" { printf("Relational Operator: %s\n", yytext); }
+"\+\+|--" { printf("Unary Operator: %s\n", yytext); }
+"[+\-/%\*]" { printf("Arithmetic Operator: %s\n", yytext); }
+"=" { printf("Assignment Operator: %s\n", yytext); }
+. { printf("Unknown Token: %s\n", yytext); }
 
-int main()
-{
-    int i;
-    yyin = fopen("code.java","r");
+%%
+
+int main() {
+    yyin = fopen("input.java", "r");
     yylex();
-    yywrap();
-}
-
-int yywrap(void)
-{
-    return 1;
+    fclose(yyin);
+    return 0;
 }
