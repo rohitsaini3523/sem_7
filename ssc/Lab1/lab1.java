@@ -234,6 +234,19 @@ public class lab1 {
                         temp[0] = temp[0];
                     }
                     output[i] = Location_Counter++ + "  " + temp[0];
+                    if(temp[0].contains("AD,5"))
+                    {
+                        output[i] = "";
+                        //for loop to print all literals in literal table
+                        for(String key: literal_index.keySet())
+                        {
+                            literal l = literal_index.get(key);
+                            // System.out.println(l.literal_no + " " + l.literal_name + " " + l.address);
+                            output[i] += Location_Counter++ + "  " + temp[0] + " " + "(C,"
+                                    + l.literal_name.split("'")[1] + ")\n";
+                        }
+                       output[i] =  output[i].substring(0, output[i].length() - 1);
+                    }
 
                 } else if (temp.length == 2) {
                     if (temp[0].equals("LAST")) {
@@ -594,11 +607,22 @@ public class lab1 {
         System.out.println("Machine Code Instructions: ");
         String machine_code = "";
         for (int i = 1; i < intermediateCode.length; i++) {
+            // check if string in intermediateCode[i] contain AD if yes the i++
+            if (intermediateCode[i].contains("AD,3") || intermediateCode[i].contains("AD,2")) {
+                continue;
+            }
             String line = intermediateCode[i];
             String temp = "";
             String[] tokens = string_token.token(line, " ");
             for (String l : tokens) {
                 // System.out.println(l);
+                if (l.contains("DL,1") || l.contains("DL,2")) {
+                    break;
+                }
+                if(l.contains("AD,5"))
+                {
+                    continue;
+                }
                 try {
                     int k = Integer.parseInt(l);
                     temp = "" + k;

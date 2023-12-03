@@ -1,0 +1,16 @@
+https://www.digitalocean.com/community/tutorials/how-to-set-up-an-nfs-mount-on-ubuntu-20-04
+
+
+sudo apt-get install nfs-kernel-server
+
+
+sudo mkdir /var/nfs/general -p
+ls -la /var/nfs/general
+sudo chown nobody:nogroup /var/nfs/general
+ls -la /var/nfs/general
+sudo nano /etc/exports
+	/var/nfs/general    client_ip(rw,sync,no_subtree_check)
+sudo systemctl restart nfs-kernel-server
+sudo ufw status
+sudo ufw allow from 172.16.182.109 to any port nfs
+sudo ufw status

@@ -32,7 +32,7 @@ int evaluateExpression(const char *expression)
 int add(const char *data)
 {
     int result = evaluateExpression(data);
-    // printf("Result: %d\n", result);
+    printf("Result: %d\n", result);
     return result;
 }
 

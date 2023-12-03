@@ -1,0 +1,8 @@
+sudo apt-get update
+sudo apt-get install nfs-common 
+sudo dpkg --configure -a
+sudo apt-get install nfs-common 
+sudo mkdir -p /nfs/general
+sudo mount 172.16.182.104://var/nfs/general /nfs/general/
+sudo nano /etc/fstab (write following at the end of the file)
+		172.16.182.104:/var/nfs/general    /nfs/general   nfs auto,nofail,noatime,nolock,intr,tcp,actimeo=1800 0 0
